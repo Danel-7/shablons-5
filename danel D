@@ -1,0 +1,107 @@
+import java.util.Scanner;
+
+// 1. Интерфейс
+interface IPaymentStrategy {
+    void pay(double amount);
+}
+
+// 2. Банк картасы стратегиясы
+class CreditCardPayment implements IPaymentStrategy {
+    private String cardNumber;
+
+    public CreditCardPayment(String cardNumber) {
+        this.cardNumber = cardNumber;
+    }
+
+    @Override
+    public void pay(double amount) {
+        System.out.println("[Банк картасы] " + cardNumber + " картасымен " + amount + " тг төленді.");
+    }
+}
+
+// 3. PayPal стратегиясы
+class PayPalPayment implements IPaymentStrategy {
+    private String email;
+
+    public PayPalPayment(String email) {
+        this.email = email;
+    }
+
+    @Override
+    public void pay(double amount) {
+        System.out.println("[PayPal] " + email + " арқылы " + amount + " тг төленді.");
+    }
+}
+
+// 4. Криптовалюта стратегиясы
+class CryptoPayment implements IPaymentStrategy {
+    private String walletAddress;
+
+    public CryptoPayment(String walletAddress) {
+        this.walletAddress = walletAddress;
+    }
+
+    @Override
+    public void pay(double amount) {
+        System.out.println("[Криптовалюта] " + walletAddress + " мекенжайынан " + amount + " тг төленді.");
+    }
+}
+
+// 5. Контекст класы
+class PaymentContext {
+    private IPaymentStrategy strategy;
+
+    public void setStrategy(IPaymentStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    public void executePayment(double amount) {
+        if (strategy == null) {
+            System.out.println("Қате: Төлем стратегиясы таңдалмаған!");
+            return;
+        }
+        strategy.pay(amount);
+    }
+}
+
+// 6. Бас Main класс
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        PaymentContext context = new PaymentContext();
+
+        System.out.println("Төлем түрін таңдаңыз:");
+        System.out.println("1 - Банк картасы");
+        System.out.println("2 - PayPal");
+        System.out.println("3 - Криптовалюта");
+        System.out.print("Таңдау (1/2/3): ");
+        String choice = scanner.nextLine();
+
+        System.out.print("Төлем сомасын енгізіңіз (теңге): ");
+        double amount = Double.parseDouble(scanner.nextLine());
+
+        switch (choice) {
+            case "1":
+                System.out.print("Карта нөмірін енгізіңіз: ");
+                String card = scanner.nextLine();
+                context.setStrategy(new CreditCardPayment(card));
+                break;
+            case "2":
+                System.out.print("PayPal email енгізіңіз: ");
+                String email = scanner.nextLine();
+                context.setStrategy(new PayPalPayment(email));
+                break;
+            case "3":
+                System.out.print("Крипто әмиян мекенжайын енгізіңіз: ");
+                String wallet = scanner.nextLine();
+                context.setStrategy(new CryptoPayment(wallet));
+                break;
+            default:
+                System.out.println("Қате: дұрыс таңдау жасамадыңыз!");
+                return;
+        }
+
+        context.executePayment(amount);
+        scanner.close();
+    }
+}
